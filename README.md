@@ -160,6 +160,51 @@ curl -X POST http://localhost:8000/sales/settle_matched \
   - Image ratio: `.listing-image-container { aspect-ratio: … }`
   - Card padding: `.listing-content { padding: … }`
 
+
+## Using More Images (Stock or AI)
+
+You can use both local files and remote image URLs for:
+
+- Promo banners (`PROMO_SLIDES` in `web/app.js`)
+- Listing image galleries (`images` array in `data/listings.json`)
+
+### Supported image paths
+
+- Local/static paths: `/banner_1.svg`, `/car_1.png`, `/my_new_photo.jpg`
+- Remote URLs: `https://images.example.com/car-front-01.jpg`
+
+The frontend now normalizes image paths and applies an automatic fallback if a URL fails to load, so broken images gracefully swap to default artwork.
+
+### Example listing using mixed sources
+
+```json
+{
+  "id": "lst_90001",
+  "make": "Porsche",
+  "model": "911 Carrera",
+  "year": 2022,
+  "images": [
+    "https://images.example-cdn.com/porsche-911-front.jpg",
+    "/car_2.png",
+    "https://images.example-cdn.com/porsche-911-rear.jpg"
+  ]
+}
+```
+
+### AI generation workflow (fast)
+
+1. Generate 4:3 images (recommended: 1600x1200 or 1200x900).
+2. Keep style consistent (lighting, angle, color grading).
+3. Save optimized `.jpg`/`.webp` files into `web/` for best performance.
+4. Reference them with absolute static paths in listing JSON (for example: `/listing_911_front.jpg`).
+
+### Stock image workflow
+
+1. Download images with commercial-safe licenses.
+2. Rename to descriptive, lowercase files (for example: `listing_tesla_model3_front.jpg`).
+3. Compress before commit to keep page loads fast.
+4. Update listing `images` or banner entries in `web/app.js`.
+
 ## Hosting Notes
 
 1. Run `python3 src/p2p_cars_api.py`.
