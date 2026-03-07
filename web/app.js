@@ -9,6 +9,9 @@ let bestAskByListing = new Map();
 let userProfile = null;
 let promoTimer = null;
 
+const DEFAULT_BANNER_IMAGE = "/banner_1.svg";
+const DEFAULT_LISTING_IMAGE = "/photo_1.svg";
+
 try {
   const persisted = localStorage.getItem("savedVehicles");
   savedVehicles = persisted ? JSON.parse(persisted) : [];
@@ -98,6 +101,21 @@ function escapeHtml(value) {
   });
 }
 
+function normalizeImageSrc(value, fallback = DEFAULT_LISTING_IMAGE) {
+  if (typeof value !== "string") return fallback;
+  const src = value.trim();
+  if (!src) return fallback;
+  if (src.startsWith("/") || src.startsWith("./") || src.startsWith("../")) return src;
+  if (src.startsWith("https://") || src.startsWith("http://")) return src;
+  return fallback;
+}
+
+function withImageFallback(src, fallback = DEFAULT_LISTING_IMAGE) {
+  const safeSrc = escapeHtml(normalizeImageSrc(src, fallback));
+  const safeFallback = escapeHtml(normalizeImageSrc(fallback, DEFAULT_LISTING_IMAGE));
+  return `src="${safeSrc}" onerror="this.onerror=null;this.src='${safeFallback}'"`;
+}
+
 function formatBTC(num) {
   return parseFloat(num).toFixed(8).replace(/\.?0+$/, "");
 }
@@ -130,7 +148,11 @@ function initPromo() {
   let idx = 0;
   function render() {
     const s = PROMO_SLIDES[idx];
-    img.src = s.img;
+    img.src = normalizeImageSrc(s.img, DEFAULT_BANNER_IMAGE);
+    img.onerror = () => {
+      img.onerror = null;
+      img.src = DEFAULT_BANNER_IMAGE;
+    };
     kicker.textContent = s.kicker;
     title.textContent = s.title;
     sub.textContent = s.sub;
@@ -526,12 +548,16 @@ function pickPlaceholder(id) {
 }
 
 function getListingHeroImage(listing) {
-  if (Array.isArray(listing.images) && listing.images.length > 0) return listing.images[0];
-  return pickPlaceholder(listing.id || `${listing.make}-${listing.model}-${listing.year}`);
+  if (Array.isArray(listing.images) && listing.images.length > 0) {
+    return normalizeImageSrc(listing.images[0], pickPlaceholder(listing.id || `${listing.make}-${listing.model}-${listing.year}`));
+  }
+  return normalizeImageSrc(pickPlaceholder(listing.id || `${listing.make}-${listing.model}-${listing.year}`), DEFAULT_LISTING_IMAGE);
 }
 
 function getListingGallery(listing) {
-  if (Array.isArray(listing.images) && listing.images.length > 0) return listing.images;
+  if (Array.isArray(listing.images) && listing.images.length > 0) {
+    return listing.images.map((img) => normalizeImageSrc(img, DEFAULT_LISTING_IMAGE));
+  }
   // fallback gallery of 3 assorted placeholders
   const pool = getImagePool();
   const primary = getListingHeroImage(listing);
@@ -563,7 +589,7 @@ function listingCard(listing) {
         <button class="favorite-btn ${isSaved ? "active" : ""}" onclick="toggleFavorite(event, '${safeId}')" title="Save Vehicle">
           ${isSaved ? "♥" : "♡"}
         </button>
-        <img class="listing-image" loading="lazy" src="${escapeHtml(imgSrc)}" alt="${safeTitle}" />
+        <img class="listing-image" loading="lazy" ${withImageFallback(imgSrc, DEFAULT_LISTING_IMAGE)} alt="${safeTitle}" />
       </div>
       <div class="listing-content">
         <div class="listing-header">
@@ -709,12 +735,12 @@ window.openDetailsModal = function (listingId) {
     <div class="details-layout">
       <div>
         <div class="gallery">
-          <img id="gallery-hero" class="details-image" src="${escapeHtml(gallery[0])}" alt="${escapeHtml(title)}" />
+          <img id="gallery-hero" class="details-image" ${withImageFallback(gallery[0], DEFAULT_LISTING_IMAGE)} alt="${escapeHtml(title)}" />
           <div class="thumb-row">
             ${gallery
               .map(
                 (src, i) => `
-              <img class="thumb ${i === 0 ? "active" : ""}" src="${escapeHtml(src)}" alt="thumb ${i + 1}" onclick="swapHero('${escapeHtml(src)}', this)" />
+              <img class="thumb ${i === 0 ? "active" : ""}" ${withImageFallback(src, DEFAULT_LISTING_IMAGE)} alt="thumb ${i + 1}" onclick="swapHero('${escapeHtml(src)}', this)" />
             `
               )
               .join("")}
@@ -896,7 +922,7 @@ async function loadListings(showSkeleton = true) {
 function adCard(slot, img, title, body) {
   return `
     <article class="card ad-card">
-      <img class="ad-image" src="${escapeHtml(img)}" alt="sponsored" />
+      <img class="ad-image" ${withImageFallback(img, DEFAULT_BANNER_IMAGE)} alt="sponsored" />
       <div class="ad-body">
         <span class="ad-badge">Sponsored</span>
         <h3>${escapeHtml(title)}</h3>
@@ -1011,7 +1037,7 @@ function renderRecentStrip() {
       const title = `${l.year} ${l.make} ${l.model}`;
       return `
         <div class="recent-card" onclick="openDetailsModal('${escapeHtml(l.id)}')">
-          <img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" />
+          <img ${withImageFallback(img, DEFAULT_LISTING_IMAGE)} alt="${escapeHtml(title)}" />
           <div class="rc-body">
             <h5>${escapeHtml(title)}</h5>
             <p>₿ ${formatBTC(l.price_btc)}</p>
