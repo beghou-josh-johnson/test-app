@@ -27,19 +27,34 @@
         <a href="/verification.html">Verification</a>
       </nav>
       <div class="nav-actions nav-actions-wrap">
-        <button id="wallet-btn" class="wallet-btn" onclick="toggleWallet()">
-          Wallet: Disconnected
-        </button>
-        <button class="btn btn-primary" onclick="openModal('listing-modal')">
-          <span>+</span> List Vehicle
-        </button>
+        <button id="user-btn" class="wallet-btn" onclick="handleUserButton()">Sign in</button>
+        <button id="wallet-btn" class="wallet-btn" onclick="toggleWallet()">Wallet: Disconnected</button>
+        <button class="btn btn-primary" onclick="openModal('listing-modal')"><span>+</span> List Vehicle</button>
       </div>
     </div>
   </header>
 
   <main class="container main-content">
+    <section id="promo" class="promo-banner card hidden">
+      <button class="promo-dismiss" aria-label="Dismiss" onclick="dismissPromo()">×</button>
+      <img id="promo-image" class="promo-image" src="/banner_1.svg" alt="promotion" />
+      <div class="promo-overlay">
+        <div>
+          <p id="promo-kicker" class="promo-kicker">New this week</p>
+          <h2 id="promo-title" class="promo-title">Premium inventory. Bitcoin-native settlement.</h2>
+          <p id="promo-sub" class="promo-sub">Browse verified listings, bid or buy now, and settle with confidence.</p>
+          <div class="promo-actions">
+            <a id="promo-cta" class="btn btn-primary" href="#marketplace">Browse Inventory</a>
+            <button class="btn btn-secondary" onclick="openModal('listing-modal')">List Vehicle</button>
+          </div>
+        </div>
+        <div id="promo-dots" class="promo-dots" aria-label="Slides"></div>
+      </div>
+    </section>
+
     <section class="hero">
       <div class="hero-copy">
+        <div id="welcome-back" class="welcome-banner hidden"></div>
         <p class="hero-kicker">Carvana polish. Bring-a-Trailer trust. Bitcoin-native settlement.</p>
         <h2>Find your next enthusiast car in a marketplace built like a modern retail app.</h2>
         <p class="hero-description">Browse verified listings, compare instant financing snapshots, and close deals with transparent escrow rails. Designed for collectors, daily drivers, and everyone between.</p>
@@ -83,27 +98,65 @@
     <section class="search-filter-bar mb-4">
       <div class="input-with-icon search-input-wrap">
         <span class="input-icon">⌕</span>
-        <input type="text" id="search-input" placeholder="Search by make, model, seller, year, or VIN..." onkeyup="filterListings()" />
+        <input type="text" id="search-input" placeholder="Search by make, model, feature, color…" oninput="onSearchInput()" />
+        <div id="search-suggestions" class="suggestions hidden" role="listbox" aria-label="Search suggestions"></div>
       </div>
+      <select id="sort-select" class="btn btn-secondary btn-pill" onchange="changeSort(this.value)" aria-label="Sort inventory">
+        <option value="recommended">Sort: Recommended</option>
+        <option value="price_asc">Price: Low to High</option>
+        <option value="price_desc">Price: High to Low</option>
+        <option value="year_desc">Year: New to Old</option>
+        <option value="mileage_asc">Mileage: Low to High</option>
+      </select>
       <button id="saved-filter-btn" class="btn btn-secondary btn-pill" onclick="toggleSavedFilter()">Saved Only: Off</button>
-      <button class="btn btn-secondary btn-pill" onclick="loadListings()">Refresh</button>
+      <button class="btn btn-secondary btn-pill show-filters-mobile" onclick="openModal('filters-modal')">Filters</button>
     </section>
 
-    <section id="marketplace">
-      <div class="marketplace-header">
-        <h3>Available Inventory</h3>
-        <span id="results-count" class="results-count"></span>
+    <section class="quick-picks" aria-label="Quick picks">
+      <div class="chip-row">
+        <button class="chip-btn" onclick="applyQuickPick('SUV')">SUVs</button>
+        <button class="chip-btn" onclick="applyQuickPick('Truck')">Trucks</button>
+        <button class="chip-btn" onclick="applyQuickPick('EV')">EVs</button>
+        <button class="chip-btn" onclick="applyQuickPick('Manual')">Manual</button>
+        <button class="chip-btn" onclick="applyQuickPick('AWD')">AWD</button>
+        <button class="chip-btn" onclick="applyQuickPick('Under1')">Under 1 BTC</button>
+        <button class="chip-btn" onclick="applyQuickPick('Coupe')">Coupes</button>
+        <button class="chip-btn" onclick="applyQuickPick('Wagon')">Wagons</button>
       </div>
-      <div id="listings" class="listings-grid">
-        <div class="empty-state">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p>Fetching inventory from the network...</p>
+    </section>
+
+    <section id="marketplace" class="marketplace-grid">
+      <aside class="recently-viewed" aria-label="Recently viewed">
+        <h4>Recently Viewed</h4>
+        <div id="recent-strip" class="recent-strip"></div>
+      </aside>
+      <aside class="filters-panel" aria-label="Filters">
+        <div class="filters-header">
+          <h3>Filters</h3>
+          <button class="btn btn-secondary btn-pill btn-clear" onclick="clearAllFilters()">Clear All</button>
         </div>
-      </div>
-      <div id="no-results" class="empty-state hidden">
-        <p>No listings match your current search.</p>
+        <div id="filters-panel" class="filters-content"></div>
+      </aside>
+
+      <div class="market-content">
+        <div class="marketplace-header">
+          <h3>Available Inventory</h3>
+          <span id="results-count" class="results-count"></span>
+        </div>
+
+        <div id="active-chips" class="chips-row"></div>
+
+        <div id="listings" class="listings-grid">
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p>Fetching inventory from the network...</p>
+          </div>
+        </div>
+        <div id="no-results" class="empty-state hidden">
+          <p>No listings match your current search.</p>
+        </div>
       </div>
     </section>
   </main>
@@ -222,6 +275,104 @@
   </div>
 
   <div id="toast-container"></div>
+
+  <div id="filters-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Filters</h2>
+        <button class="close-btn" onclick="closeModal('filters-modal')" aria-label="Close">&times;</button>
+      </div>
+      <div id="filters-modal-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="signin-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Welcome</h2>
+        <button class="close-btn" onclick="closeModal('signin-modal')" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="signin-form" class="form-grid">
+          <div class="form-group"><label>Your display name</label><input name="display_name" placeholder="e.g. satoshi_n" required /></div>
+          <button type="submit" class="btn btn-primary btn-full mt-4">Continue</button>
+          <p class="muted-text">No account is created; this is a lightweight preference for greetings and saved items.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="bid-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Place Bid</h2>
+        <button class="close-btn" onclick="closeModal('bid-modal')" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="bid-form" class="form-grid">
+          <input type="hidden" name="listing_id" id="bid-listing-id" required />
+          <div class="form-group"><label>Buyer ID</label><input name="buyer_id" placeholder="e.g. bidder_001" required /></div>
+          <div class="form-group"><label>Bid (BTC)</label><div class="input-with-icon"><span class="input-icon">₿</span><input name="bid_btc" type="number" step="0.00000001" min="0" required /></div></div>
+          <div class="form-group"><label>Buyer BTC Address</label><input name="buyer_btc_address" placeholder="bc1q..." required /></div>
+          <button type="submit" class="btn btn-primary btn-full mt-4">Submit Bid</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="ask-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Place Ask</h2>
+        <button class="close-btn" onclick="closeModal('ask-modal')" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="ask-form" class="form-grid">
+          <input type="hidden" name="listing_id" id="ask-listing-id" required />
+          <div class="form-group"><label>Seller ID</label><input name="seller_id" placeholder="e.g. seller_001" required /></div>
+          <div class="form-group"><label>Ask (BTC)</label><div class="input-with-icon"><span class="input-icon">₿</span><input name="ask_btc" type="number" step="0.00000001" min="0" required /></div></div>
+          <div class="form-group"><label>Seller BTC Address</label><input name="seller_btc_address" placeholder="bc1q..." required /></div>
+          <button type="submit" class="btn btn-primary btn-full mt-4">Submit Ask</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="buynow-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Buy Now</h2>
+        <button class="close-btn" onclick="closeModal('buynow-modal')" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="buynow-form" class="form-grid">
+          <input type="hidden" name="listing_id" id="buynow-listing-id" required />
+          <div class="form-group"><label>Buyer ID</label><input name="buyer_id" placeholder="e.g. buyer_001" required /></div>
+          <div class="form-group"><label>Buyer BTC Address</label><input name="buyer_btc_address" placeholder="bc1q..." required /></div>
+          <p class="muted-text">This will execute at the current Lowest Ask if available.</p>
+          <button type="submit" class="btn btn-primary btn-full mt-4">Confirm Buy Now</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="sellnow-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Sell Now</h2>
+        <button class="close-btn" onclick="closeModal('sellnow-modal')" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="sellnow-form" class="form-grid">
+          <input type="hidden" name="listing_id" id="sellnow-listing-id" required />
+          <div class="form-group"><label>Seller ID</label><input name="seller_id" placeholder="e.g. seller_001" required /></div>
+          <div class="form-group"><label>Seller BTC Address</label><input name="seller_btc_address" placeholder="bc1q..." required /></div>
+          <p class="muted-text">This will execute at the current Highest Bid if available.</p>
+          <button type="submit" class="btn btn-primary btn-full mt-4">Confirm Sell Now</button>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <footer class="site-footer">
     <div class="container footer-main">

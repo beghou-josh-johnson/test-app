@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="g4" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fef9c3"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g4)"/>
+  <circle cx="800" cy="450" r="320" fill="#bae6fd" opacity="0.25"/>
+  <text x="520" y="160" font-family="Outfit, Inter, sans-serif" font-size="60" fill="#0f172a" opacity="0.85">Shop • Save • Settle</text>
+  <rect x="260" y="660" width="1080" height="120" rx="28" fill="#1463ff" opacity="0.1"/>
+</svg>
+

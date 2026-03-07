@@ -1,0 +1,5 @@
+[
+  {"id": "bid_00001", "listing_id": "lst_00003", "buyer_id": "buyer_456", "bid_btc": 1.40, "buyer_btc_address": "bc1q6xj49k9n9f4m2j5x245y245y245y245y245y2", "status": "open"},
+  {"id": "bid_00002", "listing_id": "lst_00004", "buyer_id": "collector_7", "bid_btc": 2.00, "buyer_btc_address": "bc1qnf3cpwxjg6xzwmrq7c43u3sk5eew2pzlkce3y9", "status": "open"},
+  {"id": "bid_00003", "listing_id": "lst_00005", "buyer_id": "wagonfan", "bid_btc": 1.85, "buyer_btc_address": "bc1q3f2d1s2a3p4o5i6u7y8t9r0e1w2q3z4x5c6v7", "status": "open"}
+]

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="g3" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#e0e7ff"/>
+      <stop offset="100%" stop-color="#cffafe"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g3)"/>
+  <rect x="120" y="600" width="1360" height="180" rx="40" fill="#0f172a" opacity="0.08"/>
+  <rect x="200" y="240" width="800" height="120" rx="24" fill="#0ea5e9" opacity="0.18"/>
+  <text x="220" y="315" font-family="Outfit, Inter, sans-serif" font-size="56" fill="#0f172a" opacity="0.85">Escrow-First Protection</text>
+</svg>
+

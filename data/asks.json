@@ -1,0 +1,5 @@
+[
+  {"id": "ask_00001", "listing_id": "lst_00003", "seller_id": "seller_123", "ask_btc": 1.45, "seller_btc_address": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh", "status": "open"},
+  {"id": "ask_00002", "listing_id": "lst_00004", "seller_id": "porsche_guy", "ask_btc": 2.15, "seller_btc_address": "bc1qf9m3s6c0y6w2j8c9r5k0m8y6w2j8c9r5k0m8y6", "status": "open"},
+  {"id": "ask_00003", "listing_id": "lst_00005", "seller_id": "quattro_enthusiast", "ask_btc": 1.92, "seller_btc_address": "bc1qz7f6h5j4k3l2m1n0p9q8r7s6t5u4v3w2x1y0z9", "status": "open"}
+]
