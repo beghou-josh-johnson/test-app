@@ -15,9 +15,17 @@
   <header class="topbar">
     <div class="container">
       <div class="brand">
-        <h1>Satoshi Motors</h1>
-        <p class="tagline">Decentralized High-End Auto Exchange</p>
+        <div class="brand-mark">₿</div>
+        <div>
+          <h1>Satoshi Motors</h1>
+          <p class="tagline">Premium peer-to-peer car marketplace</p>
+        </div>
       </div>
+      <nav class="top-nav" aria-label="Main navigation">
+        <a href="#marketplace">Inventory</a>
+        <a href="/how-it-works.html">How it Works</a>
+        <a href="/verification.html">Verification</a>
+      </nav>
       <div class="nav-actions nav-actions-wrap">
         <button id="wallet-btn" class="wallet-btn" onclick="toggleWallet()">
           Wallet: Disconnected
@@ -31,8 +39,45 @@
 
   <main class="container main-content">
     <section class="hero">
-      <h2>Transact with absolute sovereignty.</h2>
-      <p>The premier marketplace for peer-to-peer vehicle sales settled natively on the Bitcoin network. No dealers, no fiat, pure signal.</p>
+      <div class="hero-copy">
+        <p class="hero-kicker">Carvana polish. Bring-a-Trailer trust. Bitcoin-native settlement.</p>
+        <h2>Find your next enthusiast car in a marketplace built like a modern retail app.</h2>
+        <p class="hero-description">Browse verified listings, compare instant financing snapshots, and close deals with transparent escrow rails. Designed for collectors, daily drivers, and everyone between.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="openModal('listing-modal')">Start Selling</button>
+          <a href="/how-it-works.html" class="btn btn-secondary">See Buyer Flow</a>
+        </div>
+      </div>
+      <div class="hero-panel card">
+        <h3>Marketplace Snapshot</h3>
+        <div class="hero-metrics-grid">
+          <article>
+            <p class="metric-value">24h</p>
+            <p class="metric-label">Avg response time</p>
+          </article>
+          <article>
+            <p class="metric-value">4.9/5</p>
+            <p class="metric-label">Buyer experience</p>
+          </article>
+          <article>
+            <p class="metric-value">100%</p>
+            <p class="metric-label">VIN required</p>
+          </article>
+          <article>
+            <p class="metric-value">60 mo</p>
+            <p class="metric-label">Finance preview</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust-strip" aria-label="Platform highlights">
+      <p>Trusted marketplace standards:</p>
+      <ul>
+        <li>Vehicle detail transparency</li>
+        <li>Clean, mobile-first browsing</li>
+        <li>Escrow-first deal protection</li>
+      </ul>
     </section>
 
     <section class="search-filter-bar mb-4">
