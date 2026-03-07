@@ -1,0 +1,15 @@
+[
+  {
+    "id": "lst_00001",
+    "seller_id": "user_001",
+    "vin": "1HGCM82633A004352",
+    "make": "Toyota",
+    "model": "Tacoma",
+    "year": 2019,
+    "mileage": 52210,
+    "price_btc": 0.42,
+    "seller_btc_address": "bc1qqqg8n0lyqv6gm5fd4z58xm8qnn6l5yr4mj57d0",
+    "escrow_required": true,
+    "status": "open"
+  }
+]
