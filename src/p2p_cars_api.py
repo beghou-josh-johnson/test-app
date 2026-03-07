@@ -10,6 +10,8 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
+import os
+import sys
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -265,6 +267,38 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/health":
             return self._json_response(HTTPStatus.OK, {"ok": True})
 
+        if path == "/metrics":
+            listings = _load_json(LISTINGS_FILE, [])
+            bids = _load_json(BIDS_FILE, [])
+            asks = _load_json(ASKS_FILE, [])
+            sales = _load_json(SALES_FILE, [])
+
+            def count(items: list[dict[str, Any]], key: str, value: str) -> int:
+                return sum(1 for x in items if str(x.get(key)) == value)
+
+            listings_total = len(listings)
+            listings_open = count(listings, "status", "open")
+            listings_pending = count(listings, "status", "pending")
+            listings_settled = count(listings, "status", "settled")
+            bids_open = count(bids, "status", "open")
+            asks_open = count(asks, "status", "open")
+            sales_matched = count(sales, "status", "matched")
+            sales_settled = count(sales, "status", "settled")
+            gmv_btc = round(sum(float(s.get("price_btc", 0)) for s in sales if s.get("status") == "settled"), 8)
+
+            payload = {
+                "listings_total": listings_total,
+                "listings_open": listings_open,
+                "listings_pending": listings_pending,
+                "listings_settled": listings_settled,
+                "bids_open": bids_open,
+                "asks_open": asks_open,
+                "sales_matched": sales_matched,
+                "sales_settled": sales_settled,
+                "gmv_btc": gmv_btc,
+            }
+            return self._json_response(HTTPStatus.OK, payload)
+
         if path == "/listings":
             listings = _load_json(LISTINGS_FILE, [])
             return self._json_response(HTTPStatus.OK, listings)
@@ -491,8 +525,14 @@ def main() -> None:
         if not file_path.exists():
             _save_json(file_path, [])
 
-    server = ThreadingHTTPServer(("0.0.0.0", 8000), Handler)
-    print("P2P Cars API listening on http://0.0.0.0:8000")
+    # Allow optional port override via env or first CLI argument
+    port_str = os.getenv("PORT") or (sys.argv[1] if len(sys.argv) > 1 else "8000")
+    try:
+        port = int(port_str)
+    except ValueError:
+        port = 8000
+    server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
+    print(f"P2P Cars API listening on http://0.0.0.0:{port}")
     server.serve_forever()
 
 

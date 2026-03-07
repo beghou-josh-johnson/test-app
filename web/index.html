@@ -1,15 +1,26 @@
 <!doctype html>
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Satoshi Motors | Premium P2P Car Market</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Satoshi Motors is a premium peer‑to‑peer car marketplace with Bitcoin‑native settlement. Browse verified listings, bid/ask orderbook, and escrow support." />
+    <link rel="canonical" href="http://localhost:8000/" />
+    <meta property="og:title" content="Satoshi Motors | Premium P2P Car Market" />
+    <meta property="og:description" content="Browse verified listings, compare bids and asks, and settle with Bitcoin." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="http://localhost:8000/" />
+    <meta property="og:image" content="/car_1.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Satoshi Motors | Premium P2P Car Market" />
+    <meta name="twitter:description" content="Bitcoin‑native peer‑to‑peer car marketplace with an orderbook and escrow." />
+    <meta name="twitter:image" content="/car_2.png" />
+    <title>Satoshi Motors | Premium P2P Car Market</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css" />
-</head>
+  </head>
 
 <body>
   <header class="topbar">
@@ -93,6 +104,40 @@
         <li>Clean, mobile-first browsing</li>
         <li>Escrow-first deal protection</li>
       </ul>
+    </section>
+
+    <section class="gallery-section" aria-label="Featured vehicle images">
+      <div class="gallery-header">
+        <p class="section-kicker">Inspiration</p>
+        <h3>Featured rides from the community</h3>
+        <p class="muted-text">A rotating selection of stock and AI-generated imagery to set the vibe.</p>
+      </div>
+      <div class="gallery-grid">
+        <figure class="gallery-item card">
+          <img src="/car_1.png" alt="Silver sports coupe on mountain road" loading="lazy" />
+          <figcaption>Performance coupe</figcaption>
+        </figure>
+        <figure class="gallery-item card">
+          <img src="/car_2.png" alt="Red classic car at sunset" loading="lazy" />
+          <figcaption>Classic at golden hour</figcaption>
+        </figure>
+        <figure class="gallery-item card">
+          <img src="/photo_1.svg" alt="Abstract automotive silhouette" loading="lazy" />
+          <figcaption>AI silhouette</figcaption>
+        </figure>
+        <figure class="gallery-item card">
+          <img src="/photo_2.svg" alt="Minimalist car profile" loading="lazy" />
+          <figcaption>Minimalist profile</figcaption>
+        </figure>
+        <figure class="gallery-item card">
+          <img src="/photo_3.svg" alt="Concept EV outline" loading="lazy" />
+          <figcaption>Concept EV</figcaption>
+        </figure>
+        <figure class="gallery-item card">
+          <img src="/photo_4.svg" alt="Sport utility silhouette" loading="lazy" />
+          <figcaption>Utility</figcaption>
+        </figure>
+      </div>
     </section>
 
     <section class="search-filter-bar mb-4">
@@ -397,6 +442,15 @@
             <li><a href="/dispute-resolution.html">Dispute Resolution</a></li>
           </ul>
         </div>
+        <div>
+          <h4>Contact</h4>
+          <ul class="footer-contact-list">
+            <li><a href="mailto:support@satoshimotors.com">support@satoshimotors.com</a></li>
+            <li><a href="tel:+14155550148">+1 (415) 555-0148</a></li>
+            <li><a href="mailto:compliance@satoshimotors.com">compliance@satoshimotors.com</a></li>
+            <li><span>600 Congress Ave, Austin, TX</span></li>
+          </ul>
+        </div>
       </div>
     </div>
     <div class="container footer-meta">
@@ -406,6 +460,20 @@
   </footer>
 
   <script src="/app.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Satoshi Motors",
+    "url": "http://localhost:8000/",
+    "description": "Premium peer-to-peer car marketplace with Bitcoin-native settlement.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "http://localhost:8000/?q={search_term}",
+      "query-input": "required name=search_term"
+    }
+  }
+  </script>
 </body>
 
 </html>

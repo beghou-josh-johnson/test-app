@@ -1,0 +1,21 @@
+Workspace Rules (Cursor)
+
+Purpose
+- These are workspace-level rules for Cursor AI.
+- Keep the app dependency-free (Python stdlib API + static web), validate inputs, and preserve repo naming/ID patterns.
+
+Global
+- Python 3.10+, 4-space indents, type hints encouraged.
+- No external network calls or packages; stdlib only.
+- JSON keys snake_case; IDs: lst_00001, bid_00001, ask_00001, sal_00001.
+- Endpoints mirror code style (e.g., /sales/settle_matched).
+- Atomic writes to data/*.json, handlers non-blocking, all inputs validated.
+- Frontend under web/ is pure HTML/CSS/JS; keep it fast, accessible, and mobile-first.
+
+Testing
+- Use pytest; add tests for new validation/ID logic, keep tests deterministic.
+
+How to Use (Cursor)
+- Open Cursor → AI → Rules → Workspace and enable the roles you need from .cursor/rules/.
+- You can enable multiple roles at once (e.g., Project Manager + Frontend Engineer).
+

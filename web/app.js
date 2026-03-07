@@ -173,11 +173,18 @@ function updateUserUI() {
   if (banner) {
     if (userProfile) {
       banner.innerHTML = `
-        <span>Welcome back, <strong>${escapeHtml(userProfile.name)}</strong> — Saved: ${countSaved} • Open Bids: ${bidsCount} • Open Asks: ${asksCount}</span>
-        <span class="welcome-actions">
+        <div class="welcome-left">
+          <h3 class="welcome-title">Welcome back, <strong>${escapeHtml(userProfile.name)}</strong></h3>
+          <div class="welcome-stats">
+            <div class="stat-chip" aria-label="Saved vehicles"><span class="stat-label">Saved</span><span class="stat-value">${countSaved}</span></div>
+            <div class="stat-chip" aria-label="Open bids"><span class="stat-label">Open Bids</span><span class="stat-value">${bidsCount}</span></div>
+            <div class="stat-chip" aria-label="Open asks"><span class="stat-label">Open Asks</span><span class="stat-value">${asksCount}</span></div>
+          </div>
+        </div>
+        <div class="welcome-actions">
           <button class="btn btn-secondary" onclick="toggleSavedFilter()">View Saved</button>
           <button class="btn btn-secondary" onclick="openModal('listing-modal')">List Vehicle</button>
-        </span>`;
+        </div>`;
       banner.classList.remove("hidden");
     } else {
       banner.classList.add("hidden");
@@ -556,11 +563,15 @@ function listingCard(listing) {
         <button class="favorite-btn ${isSaved ? "active" : ""}" onclick="toggleFavorite(event, '${safeId}')" title="Save Vehicle">
           ${isSaved ? "♥" : "♡"}
         </button>
-        <img class="listing-image" src="${escapeHtml(imgSrc)}" alt="${safeTitle}" />
+        <img class="listing-image" loading="lazy" src="${escapeHtml(imgSrc)}" alt="${safeTitle}" />
       </div>
       <div class="listing-content">
         <div class="listing-header">
           <h3 class="listing-title">${safeTitle}</h3>
+        </div>
+        <div class="listing-badges">
+          <span class="vin-badge" title="VIN provided">VIN: ${safeVin}</span>
+          <span class="escrow-badge ${listing.escrow_required ? 'required' : 'optional'}" title="${listing.escrow_required ? 'Escrow is required' : 'Escrow is optional'}">Escrow: ${listing.escrow_required ? 'Required' : 'Optional'}</span>
         </div>
 
         <div class="listing-price">

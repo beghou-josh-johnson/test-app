@@ -23,6 +23,22 @@ Open:
 
 Data is stored in `data/` and auto-created on first run.
 
+## Cursor Agents Setup
+
+This repo includes workspace rules and role files for Cursor AI.
+
+- Global rules: `.cursorrules` (applies repo-wide)
+- Role-specific rules: `.cursor/rules/`
+  - `carvana-specialist.md` — marketplace UX/design guidance
+  - `frontend-engineer.md` — web UI implementation rules
+  - `backend-engineer.md` — API/validation rules
+  - `project-manager.md` — planning and review cadence
+
+How to use in Cursor
+- Open Cursor → AI → Rules → Workspace.
+- Enable the roles you want (you can combine, e.g., Project Manager + Frontend Engineer).
+- Start a chat and reference the role, e.g., “Use Frontend Engineer and Carvana Specialist rules to polish the listing cards.”
+
 ## Current Functionality
 
 - Browsing
@@ -46,6 +62,7 @@ Data is stored in `data/` and auto-created on first run.
 
 - Core
   - `GET /health`
+  - `GET /metrics` — counts for listings, bids/asks, sales, and GMV (BTC)
   - `GET /listings`
   - `POST /listings`
   - `GET /offers` • `POST /offers` (legacy direct offers)
@@ -146,7 +163,7 @@ curl -X POST http://localhost:8000/sales/settle_matched \
 ## Hosting Notes
 
 1. Run `python3 src/p2p_cars_api.py`.
-2. Expose port `8000` publicly.
+2. Expose port `8000` publicly (or set a custom port with `PORT=8001 python3 src/p2p_cars_api.py` or `python3 src/p2p_cars_api.py 8001`).
 3. Persist `data/` between deploys.
 
 ## Roadmap
