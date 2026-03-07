@@ -1,4 +1,12 @@
-from src.p2p_cars_api import ValidationError, _validate_listing, _validate_offer
+from pathlib import Path
+
+from src.p2p_cars_api import (
+    ValidationError,
+    _content_type,
+    _next_id,
+    _validate_listing,
+    _validate_offer,
+)
 
 
 def test_validate_listing_ok():
@@ -46,3 +54,19 @@ def test_validate_offer_ok():
     }
     out = _validate_offer(payload)
     assert out["status"] == "pending"
+
+
+def test_content_types():
+    assert _content_type(Path("index.html")).startswith("text/html")
+    assert _content_type(Path("styles.css")).startswith("text/css")
+    assert _content_type(Path("app.js")).startswith("application/javascript")
+
+
+def test_next_id_skips_non_numeric_and_uses_max_numeric_suffix():
+    items = [
+        {"id": "lst_00002"},
+        {"id": "lst_bad"},
+        {"id": "lst_00011"},
+        {"id": "different_00099"},
+    ]
+    assert _next_id("lst", items) == "lst_00012"

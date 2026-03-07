@@ -13,12 +13,15 @@ from dataclasses import dataclass
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from typing import Any
+from urllib.parse import urlparse
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 LISTINGS_FILE = DATA_DIR / "listings.json"
 OFFERS_FILE = DATA_DIR / "offers.json"
 SALES_FILE = DATA_DIR / "sales.json"
+WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 
 VIN_RE = re.compile(r"^[A-HJ-NPR-Z0-9]{17}$")
 BTC_ADDR_RE = re.compile(r"^(bc1|[13])[a-zA-HJ-NP-Z0-9]{24,87}$")
@@ -38,9 +41,22 @@ def _load_json(path: Path, default: Any) -> Any:
 
 def _save_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
-        json.dump(payload, f, indent=2)
-        f.write("\n")
+    with NamedTemporaryFile("w", delete=False, dir=path.parent, encoding="utf-8") as tmp:
+        json.dump(payload, tmp, indent=2)
+        tmp.write("\n")
+        temp_name = tmp.name
+    Path(temp_name).replace(path)
+
+
+def _next_id(prefix: str, items: list[dict[str, Any]]) -> str:
+    max_id = 0
+    for item in items:
+        raw = str(item.get("id", ""))
+        if raw.startswith(f"{prefix}_"):
+            number = raw.split("_", 1)[1]
+            if number.isdigit():
+                max_id = max(max_id, int(number))
+    return f"{prefix}_{max_id + 1:05d}"
 
 
 def _validate_listing(payload: dict[str, Any]) -> dict[str, Any]:
@@ -116,6 +132,17 @@ def _validate_offer(payload: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
+def _content_type(path: Path) -> str:
+    suffix = path.suffix.lower()
+    if suffix == ".html":
+        return "text/html; charset=utf-8"
+    if suffix == ".css":
+        return "text/css; charset=utf-8"
+    if suffix == ".js":
+        return "application/javascript; charset=utf-8"
+    return "application/octet-stream"
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "P2PCars/0.1"
 
@@ -138,44 +165,65 @@ class Handler(BaseHTTPRequestHandler):
             raise ValidationError("Request body must be a JSON object")
         return payload
 
-    def do_GET(self) -> None:  # noqa: N802
-        if self.path == "/health":
+    def _route_get(self, path: str, head_only: bool = False) -> None:
+        if path == "/health":
             return self._json_response(HTTPStatus.OK, {"ok": True})
 
-        if self.path == "/listings":
+        if path == "/listings":
             listings = _load_json(LISTINGS_FILE, [])
             return self._json_response(HTTPStatus.OK, listings)
 
-        if self.path == "/offers":
+        if path == "/offers":
             offers = _load_json(OFFERS_FILE, [])
             return self._json_response(HTTPStatus.OK, offers)
 
-        if self.path == "/sales":
+        if path == "/sales":
             sales = _load_json(SALES_FILE, [])
             return self._json_response(HTTPStatus.OK, sales)
 
+        static_name = "index.html" if path == "/" else path.lstrip("/")
+        static_file = (WEB_DIR / static_name).resolve()
+        if WEB_DIR.resolve() in static_file.parents and static_file.exists() and static_file.is_file():
+            body = static_file.read_bytes()
+            self.send_response(HTTPStatus.OK)
+            self.send_header("Content-Type", _content_type(static_file))
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            if not head_only:
+                self.wfile.write(body)
+            return
+
         return self._json_response(HTTPStatus.NOT_FOUND, {"error": "Not found"})
+
+    def do_GET(self) -> None:  # noqa: N802
+        path = urlparse(self.path).path
+        self._route_get(path)
+
+    def do_HEAD(self) -> None:  # noqa: N802
+        path = urlparse(self.path).path
+        self._route_get(path, head_only=True)
 
     def do_POST(self) -> None:  # noqa: N802
         try:
             payload = self._read_json_body()
-            if self.path == "/listings":
+            path = urlparse(self.path).path
+            if path == "/listings":
                 listing = _validate_listing(payload)
                 listings = _load_json(LISTINGS_FILE, [])
-                listing["id"] = f"lst_{len(listings) + 1:05d}"
+                listing["id"] = _next_id("lst", listings)
                 listings.append(listing)
                 _save_json(LISTINGS_FILE, listings)
                 return self._json_response(HTTPStatus.CREATED, listing)
 
-            if self.path == "/offers":
+            if path == "/offers":
                 offer = _validate_offer(payload)
                 offers = _load_json(OFFERS_FILE, [])
-                offer["id"] = f"off_{len(offers) + 1:05d}"
+                offer["id"] = _next_id("off", offers)
                 offers.append(offer)
                 _save_json(OFFERS_FILE, offers)
                 return self._json_response(HTTPStatus.CREATED, offer)
 
-            if self.path == "/sales/settle":
+            if path == "/sales/settle":
                 required = ["listing_id", "offer_id", "btc_txid"]
                 missing = [k for k in required if k not in payload]
                 if missing:
@@ -183,7 +231,7 @@ class Handler(BaseHTTPRequestHandler):
 
                 sales = _load_json(SALES_FILE, [])
                 sale = {
-                    "id": f"sal_{len(sales) + 1:05d}",
+                    "id": _next_id("sal", sales),
                     "listing_id": payload["listing_id"],
                     "offer_id": payload["offer_id"],
                     "btc_txid": payload["btc_txid"],

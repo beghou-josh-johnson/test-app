@@ -1,15 +1,13 @@
 # P2P Bitcoin Car Market (MVP)
 
-This repo starts a simple **data-first** app where people can list and buy cars directly from each other using Bitcoin—without a dealer.
+A lightweight Craigslist-style marketplace for peer-to-peer car sales priced in Bitcoin.
 
 ## What is included
 
-- A minimal Python HTTP API with no external dependencies.
-- JSON-backed storage for:
-  - car listings,
-  - buyer offers,
-  - settled sales.
-- Basic validation for VIN format, Bitcoin addresses, and numeric pricing fields.
+- A dependency-free Python backend API.
+- A simple, elegant web UI served by the same server.
+- JSON-backed storage for listings, offers, and settled sales.
+- Validation for VIN format, Bitcoin addresses, and core numeric fields.
 
 ## Quick start
 
@@ -17,7 +15,12 @@ This repo starts a simple **data-first** app where people can list and buy cars 
 python3 src/p2p_cars_api.py
 ```
 
-Then call endpoints:
+Open:
+
+- Web app: `http://localhost:8000/`
+- Health: `http://localhost:8000/health`
+
+## API endpoints
 
 - `GET /health`
 - `GET /listings`
@@ -45,10 +48,26 @@ curl -X POST http://localhost:8000/listings \
   }'
 ```
 
+## Hosting notes
+
+This is easy to host on any small VM or container platform:
+
+1. Deploy this repo.
+2. Run `python3 src/p2p_cars_api.py`.
+3. Expose port `8000` publicly.
+4. Persist the `data/` directory between deploys.
+
 ## Next milestones
 
-1. Add authentication and signed wallet ownership proof.
-2. Add escrow state machine + dispute handling.
-3. Add reputation, chat, and fraud controls.
-4. Move persistence to PostgreSQL.
-5. Add web/mobile UX.
+1. Add auth and wallet-signature ownership proof.
+2. Add escrow workflow and dispute resolution.
+3. Add moderation, fraud controls, and reputation.
+4. Move to PostgreSQL and background jobs.
+5. Add image uploads and richer listing search.
+
+
+## Merge-hardening updates
+
+- IDs are now generated from the current max ID in JSON, so merges/manual edits are less likely to cause duplicate IDs.
+- JSON writes are atomic (write-temp-then-replace) to reduce corrupted files on abrupt restarts.
+- `HEAD` requests now work for routes/static files (helpful for host health checks and uptime probes).
