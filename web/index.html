@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>btc cars — peer-to-peer marketplace</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container row">
+        <h1>btc cars</h1>
+        <p class="tagline">buy & sell cars with bitcoin · no dealer</p>
+        <button id="reset-demo" class="ghost">Reset demo data</button>
+      </div>
+    </header>
+
+    <main class="container layout">
+      <section class="panel">
+        <h2>Create listing</h2>
+        <form id="listing-form" class="form-grid">
+          <label>Seller ID<input name="seller_id" required /></label>
+          <label>VIN<input name="vin" required minlength="17" maxlength="17" /></label>
+          <label>Make<input name="make" required /></label>
+          <label>Model<input name="model" required /></label>
+          <label>Year<input name="year" type="number" min="1980" max="2100" required /></label>
+          <label>Mileage<input name="mileage" type="number" min="0" required /></label>
+          <label>Price (BTC)<input name="price_btc" type="number" step="0.00000001" min="0.00000001" required /></label>
+          <label>Seller BTC Address<input name="seller_btc_address" required /></label>
+          <label class="checkbox"><input name="escrow_required" type="checkbox" checked /> Escrow required</label>
+          <button type="submit">Post listing</button>
+        </form>
+        <p id="listing-message" class="message"></p>
+      </section>
+
+      <section class="panel">
+        <h2>Live listings</h2>
+        <div id="listings" class="listings"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Submit offer</h2>
+        <form id="offer-form" class="form-grid">
+          <label>Listing ID<input name="listing_id" required /></label>
+          <label>Buyer ID<input name="buyer_id" required /></label>
+          <label>Offer (BTC)<input name="offered_btc" type="number" step="0.00000001" min="0.00000001" required /></label>
+          <label>Buyer BTC Address<input name="buyer_btc_address" required /></label>
+          <button type="submit">Send offer</button>
+        </form>
+        <p id="offer-message" class="message"></p>
+      </section>
+
+      <section class="panel wide">
+        <h2>Recent offers</h2>
+        <div id="offers" class="listings"></div>
+      </section>
+
+      <section class="panel wide">
+        <h2>Settled sales</h2>
+        <div id="sales" class="listings"></div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

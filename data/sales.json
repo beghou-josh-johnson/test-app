@@ -1,0 +1,9 @@
+[
+  {
+    "id": "sal_00001",
+    "listing_id": "lst_00099",
+    "offer_id": "off_00042",
+    "btc_txid": "demo_tx_abc123",
+    "status": "settled"
+  }
+]

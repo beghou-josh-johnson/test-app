@@ -1,0 +1,10 @@
+[
+  {
+    "id": "off_00001",
+    "listing_id": "lst_00001",
+    "buyer_id": "user_331",
+    "offered_btc": 0.4,
+    "buyer_btc_address": "bc1qqqg8n0lyqv6gm5fd4z58xm8qnn6l5yr4mj57d0",
+    "status": "pending"
+  }
+]
