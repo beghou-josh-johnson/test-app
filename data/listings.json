@@ -11,5 +11,31 @@
     "seller_btc_address": "bc1qqqg8n0lyqv6gm5fd4z58xm8qnn6l5yr4mj57d0",
     "escrow_required": true,
     "status": "open"
+  },
+  {
+    "seller_id": "jah",
+    "vin": "12312414232323244",
+    "make": "Volvo",
+    "model": "XC90",
+    "year": 2023,
+    "mileage": 20934,
+    "price_btc": 1.0,
+    "seller_btc_address": "bc1qv5y5dkf3scw0fvg560kze3k34aqrhacq94l9z2",
+    "escrow_required": true,
+    "status": "open",
+    "id": "lst_00002"
+  },
+  {
+    "seller_id": "seller_123",
+    "vin": "1234567890ABCDEFG",
+    "make": "Tesla",
+    "model": "Model S",
+    "year": 2024,
+    "mileage": 1000,
+    "price_btc": 1.5,
+    "seller_btc_address": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+    "escrow_required": true,
+    "status": "open",
+    "id": "lst_00003"
   }
 ]

@@ -1,55 +1,215 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>btc cars — peer-to-peer marketplace</title>
-    <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body>
-    <header class="topbar">
-      <div class="container row">
-        <h1>btc cars</h1>
-        <p class="tagline">buy & sell cars with bitcoin · no dealer</p>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Satoshi Motors | Premium P2P Car Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">
+        <h1>Satoshi Motors</h1>
+        <p class="tagline">Decentralized High-End Auto Exchange</p>
       </div>
-    </header>
+      <div class="nav-actions nav-actions-wrap">
+        <button id="wallet-btn" class="wallet-btn" onclick="toggleWallet()">
+          Wallet: Disconnected
+        </button>
+        <button class="btn btn-primary" onclick="openModal('listing-modal')">
+          <span>+</span> List Vehicle
+        </button>
+      </div>
+    </div>
+  </header>
 
-    <main class="container layout">
-      <section class="panel">
-        <h2>Create listing</h2>
+  <main class="container main-content">
+    <section class="hero">
+      <h2>Transact with absolute sovereignty.</h2>
+      <p>The premier marketplace for peer-to-peer vehicle sales settled natively on the Bitcoin network. No dealers, no fiat, pure signal.</p>
+    </section>
+
+    <section class="search-filter-bar mb-4">
+      <div class="input-with-icon search-input-wrap">
+        <span class="input-icon">⌕</span>
+        <input type="text" id="search-input" placeholder="Search by make, model, seller, year, or VIN..." onkeyup="filterListings()" />
+      </div>
+      <button id="saved-filter-btn" class="btn btn-secondary btn-pill" onclick="toggleSavedFilter()">Saved Only: Off</button>
+      <button class="btn btn-secondary btn-pill" onclick="loadListings()">Refresh</button>
+    </section>
+
+    <section id="marketplace">
+      <div class="marketplace-header">
+        <h3>Available Inventory</h3>
+        <span id="results-count" class="results-count"></span>
+      </div>
+      <div id="listings" class="listings-grid">
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p>Fetching inventory from the network...</p>
+        </div>
+      </div>
+      <div id="no-results" class="empty-state hidden">
+        <p>No listings match your current search.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="listing-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Create Listing</h2>
+        <button class="close-btn" onclick="closeModal('listing-modal')" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
         <form id="listing-form" class="form-grid">
-          <label>Seller ID<input name="seller_id" required /></label>
-          <label>VIN<input name="vin" required minlength="17" maxlength="17" /></label>
-          <label>Make<input name="make" required /></label>
-          <label>Model<input name="model" required /></label>
-          <label>Year<input name="year" type="number" min="1980" max="2100" required /></label>
-          <label>Mileage<input name="mileage" type="number" min="0" required /></label>
-          <label>Price (BTC)<input name="price_btc" type="number" step="0.00000001" min="0" required /></label>
-          <label>Seller BTC Address<input name="seller_btc_address" required /></label>
-          <label class="checkbox"><input name="escrow_required" type="checkbox" checked /> Escrow required</label>
-          <button type="submit">Post listing</button>
+          <div class="form-group">
+            <label>Seller ID</label>
+            <input name="seller_id" placeholder="e.g. whale_123" required />
+          </div>
+
+          <div class="form-group">
+            <label>VIN (17 Characters)</label>
+            <input name="vin" style="text-transform: uppercase;" placeholder="1HGCM82633A004352" required minlength="17" maxlength="17" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Make</label>
+              <input name="make" placeholder="Porsche" required />
+            </div>
+            <div class="form-group">
+              <label>Model</label>
+              <input name="model" placeholder="911 GT3" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Year</label>
+              <input name="year" type="number" min="1980" max="2100" placeholder="2024" required />
+            </div>
+            <div class="form-group">
+              <label>Mileage</label>
+              <input name="mileage" type="number" min="0" placeholder="1250" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Price (BTC)</label>
+            <div class="input-with-icon">
+              <span class="input-icon">₿</span>
+              <input name="price_btc" type="number" step="0.00000001" min="0" placeholder="3.5" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Receiving BTC Address</label>
+            <input name="seller_btc_address" placeholder="bc1q..." required />
+          </div>
+
+          <label class="checkbox-group">
+            <input name="escrow_required" type="checkbox" checked />
+            <span>Require Multisig Escrow</span>
+          </label>
+
+          <button type="submit" class="btn btn-primary btn-full mt-4">Broadcast Listing</button>
         </form>
-        <p id="listing-message" class="message"></p>
-      </section>
+      </div>
+    </div>
+  </div>
 
-      <section class="panel">
-        <h2>Live listings</h2>
-        <div id="listings" class="listings"></div>
-      </section>
-
-      <section class="panel">
-        <h2>Submit offer</h2>
+  <div id="offer-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Submit Offer</h2>
+        <button class="close-btn" onclick="closeModal('offer-modal')" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
         <form id="offer-form" class="form-grid">
-          <label>Listing ID<input name="listing_id" required /></label>
-          <label>Buyer ID<input name="buyer_id" required /></label>
-          <label>Offer (BTC)<input name="offered_btc" type="number" step="0.00000001" min="0" required /></label>
-          <label>Buyer BTC Address<input name="buyer_btc_address" required /></label>
-          <button type="submit">Send offer</button>
-        </form>
-        <p id="offer-message" class="message"></p>
-      </section>
-    </main>
+          <input type="hidden" name="listing_id" id="offer-listing-id" required />
 
-    <script src="/app.js"></script>
-  </body>
+          <div class="form-group">
+            <label>Target Listing</label>
+            <input type="text" id="offer-listing-display" readonly disabled class="muted-readonly" />
+          </div>
+
+          <div class="form-group">
+            <label>Buyer ID</label>
+            <input name="buyer_id" placeholder="e.g. satoshi_nakamoto" required />
+          </div>
+
+          <div class="form-group">
+            <label>Offer Amount (BTC)</label>
+            <div class="input-with-icon">
+              <span class="input-icon">₿</span>
+              <input name="offered_btc" id="offer-amount-input" type="number" step="0.00000001" min="0" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Buyer Refund BTC Address</label>
+            <input name="buyer_btc_address" placeholder="bc1q..." required />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full mt-4">Sign & Send Offer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="details-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-content details-modal-content">
+      <div class="modal-header">
+        <h2>Vehicle Details</h2>
+        <button class="close-btn" onclick="closeModal('details-modal')" aria-label="Close">&times;</button>
+      </div>
+      <div id="details-modal-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <footer class="site-footer">
+    <div class="container footer-main">
+      <div>
+        <h2 class="footer-brand">Satoshi Motors</h2>
+        <p>The decentralized future of automotive commerce.</p>
+      </div>
+      <div class="footer-links-grid">
+        <div>
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="/how-it-works.html">How it Works</a></li>
+            <li><a href="/escrow-services.html">Escrow Services</a></li>
+            <li><a href="/verification.html">Verification</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="/terms-of-service.html">Terms of Service</a></li>
+            <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+            <li><a href="/dispute-resolution.html">Dispute Resolution</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="container footer-meta">
+      <p>© 2026 Satoshi Motors. All signatures verified.</p>
+      <p>Block Height: 840,000</p>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+
 </html>

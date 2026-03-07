@@ -140,6 +140,14 @@ def _content_type(path: Path) -> str:
         return "text/css; charset=utf-8"
     if suffix == ".js":
         return "application/javascript; charset=utf-8"
+    if suffix == ".png":
+        return "image/png"
+    if suffix in {".jpg", ".jpeg"}:
+        return "image/jpeg"
+    if suffix == ".svg":
+        return "image/svg+xml"
+    if suffix == ".json":
+        return "application/json; charset=utf-8"
     return "application/octet-stream"
 
 
@@ -217,6 +225,13 @@ class Handler(BaseHTTPRequestHandler):
 
             if path == "/offers":
                 offer = _validate_offer(payload)
+                listings = _load_json(LISTINGS_FILE, [])
+                listing = next((item for item in listings if item.get("id") == offer["listing_id"]), None)
+                if listing is None:
+                    raise ValidationError("listing_id does not exist")
+                if listing.get("status") != "open":
+                    raise ValidationError("listing is not open for offers")
+
                 offers = _load_json(OFFERS_FILE, [])
                 offer["id"] = _next_id("off", offers)
                 offers.append(offer)
@@ -229,6 +244,22 @@ class Handler(BaseHTTPRequestHandler):
                 if missing:
                     raise ValidationError(f"Missing fields: {', '.join(missing)}")
 
+                listings = _load_json(LISTINGS_FILE, [])
+                offers = _load_json(OFFERS_FILE, [])
+                listing = next((item for item in listings if item.get("id") == payload["listing_id"]), None)
+                if listing is None:
+                    raise ValidationError("listing_id does not exist")
+                if listing.get("status") != "open":
+                    raise ValidationError("listing is not open")
+
+                offer = next((item for item in offers if item.get("id") == payload["offer_id"]), None)
+                if offer is None:
+                    raise ValidationError("offer_id does not exist")
+                if offer.get("listing_id") != payload["listing_id"]:
+                    raise ValidationError("offer_id does not belong to listing_id")
+                if offer.get("status") != "pending":
+                    raise ValidationError("offer is not pending")
+
                 sales = _load_json(SALES_FILE, [])
                 sale = {
                     "id": _next_id("sal", sales),
@@ -238,7 +269,20 @@ class Handler(BaseHTTPRequestHandler):
                     "status": "settled",
                 }
                 sales.append(sale)
+
+                listing["status"] = "settled"
+                offer["status"] = "accepted"
+                for sibling_offer in offers:
+                    if (
+                        sibling_offer.get("listing_id") == payload["listing_id"]
+                        and sibling_offer.get("id") != payload["offer_id"]
+                        and sibling_offer.get("status") == "pending"
+                    ):
+                        sibling_offer["status"] = "declined"
+
                 _save_json(SALES_FILE, sales)
+                _save_json(LISTINGS_FILE, listings)
+                _save_json(OFFERS_FILE, offers)
                 return self._json_response(HTTPStatus.CREATED, sale)
 
             return self._json_response(HTTPStatus.NOT_FOUND, {"error": "Not found"})
