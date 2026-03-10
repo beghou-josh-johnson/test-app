@@ -224,3 +224,54 @@ The frontend now normalizes image paths and applies an automatic fallback if a U
 - IDs are generated from max ID in JSON to reduce collisions.
 - Atomic writes (temp file then replace) guard against corruption.
 - `HEAD` works for health checks on routes/static files.
+
+---
+
+## Lonisa Mari Quote Index Scraper
+
+This repository now includes a production-oriented script for crawling public posts from `https://lonisamari.blog/`, extracting memorable quotes, assigning thematic tags, and exporting searchable Markdown and JSON indexes.
+
+### Install
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Run
+
+```bash
+python3 scrape_quotes.py
+```
+
+Optional flags:
+
+```bash
+python3 scrape_quotes.py --max-pages 120 --rate-limit 1.5 --log-level INFO
+python3 scrape_quotes.py --dry-run --max-pages 40
+python3 scrape_quotes.py --no-cache
+```
+
+### How quote extraction works
+
+1. Crawl internal, public URLs on `lonisamari.blog` while respecting `robots.txt`.
+2. Identify probable post pages using URL and page-structure heuristics (`article`, `time`, entry-content markers).
+3. Clean extracted main content by removing navigation, comments, share/subscription blocks, and boilerplate.
+4. Build quote candidates from paragraphs and adjacent multi-paragraph combinations.
+5. Score each candidate for readability, meaningful length, complete thought, emotional/spiritual signal words, and distinctiveness.
+6. Select the top 3 non-duplicate quotes per post (or fewer for very short posts).
+7. Assign 2–8 reusable lowercase tags per quote using a rule-based keyword+category hybrid.
+
+### Outputs
+
+- `quotes_index.md` — human-readable quote index with summary, tag index, and quotes grouped by post.
+- `quotes_index.json` — structured machine-readable export for reuse.
+- `.cache_pages.json` — optional local HTML cache for faster reruns.
+
+### Limitations
+
+- Heuristic post detection may miss edge-case templates or include an occasional non-post page.
+- Rule-based quote ranking can still pick weaker passages on highly irregular post formats.
+- Category extraction depends on theme markup and may not always capture all labels.
+- Tags are deterministic heuristics (no LLM API usage), so semantic nuance is limited.
